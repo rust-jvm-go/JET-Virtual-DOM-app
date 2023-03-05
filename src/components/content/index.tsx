@@ -6,6 +6,10 @@ import { ojSelectSingle } from "ojs/ojselectsingle";
 import MutableArrayDataProvider = require("ojs/ojmutablearraydataprovider");
 import "ojs/ojchart";
 import { ojChart } from "ojs/ojchart";
+import * as storeData from "text!../store_data.json";
+import "ojs/ojlistview";
+import { ojListView } from "ojs/ojlistview";
+import "ojs/ojlistitemlayout";
 
 type ChartType = {
     id: number;
@@ -44,6 +48,21 @@ const chartDataProvider: MutableArrayDataProvider<ChartItem["id"], ChartItem> =
 
 type ChartProps = ComponentProps<"oj-chart">;
 
+type Activity = {
+    id: number;
+    name: string;
+}
+
+const activityDataProvider = new MutableArrayDataProvider<Activity["id"], Activity>(
+    JSON.parse(storeData),
+    {
+        keyAttributes: "id"
+    }
+);
+
+type ListViewProps = ComponentProps<"oj-list-view">;
+const gridlinesItemVisible: ListViewProps["gridlines"] = { item: "visible" };
+
 export function Content() {
     const [val, setVal] = useState("pie" as ChartProps["type"]);
 
@@ -58,12 +77,36 @@ export function Content() {
         return <oj-chart-item value={item.data.value} groupId={[item.data.group]} seriesId={item.data.series}></oj-chart-item>;
     };
 
+    const renderListItem =
+        (item: ojListView.ItemTemplateContext<Activity["id"], Activity>
+        ) => {
+            return (
+                <li>
+                    <oj-list-item-layout>
+                        <div class="oj-typography-body-md">
+                            {item.data.name}
+                        </div>
+                    </oj-list-item-layout>
+                </li>
+            );
+        };
+
     return (
         <div class="oj-web-applayout-max-width oj-web-applayout-content">
             <h1>Product Information</h1>
+            <div id="activitiesContainer">
+                <h3 id="activitiesHeader">Activities</h3>
+                <oj-list-view id="activitiesList"
+                              aria-labelledby="activitiesHeader"
+                              data={activityDataProvider}
+                              gridlines={gridlinesItemVisible}>
+                    <template slot="itemTemplate" render={renderListItem}></template>
+                </oj-list-view>
+            </div>
             <div id="itemDetailsContainer">
-            <oj-label for="basicSelect">Select Chart:</oj-label>
-            <oj-select-single id="basicSelect" class="selectSingleStyle" data={chartTypesDP} value={val} onvalueChanged={valChangeHandler}></oj-select-single>
+                <h3>Item Details</h3>
+                <oj-label for="basicSelect">Select Chart:</oj-label>
+                <oj-select-single id="basicSelect" class="selectSingleStyle" data={chartTypesDP} value={val} onvalueChanged={valChangeHandler}></oj-select-single>
                 <oj-chart id="barChart" type={val} data={chartDataProvider} animationOnDisplay="auto"
                         animationOnDataChange="auto" hoverBehavior="dim" class="chartStyle">
                     <template slot="itemTemplate" render={chartItem}></template>
