@@ -20,3 +20,6 @@ hybrid/plugins/*
 Thumbs.db
 
 .idea
+
+*.zip
+*.war
