@@ -48,6 +48,7 @@ const chartDataProvider: MutableArrayDataProvider<ChartItem["id"], ChartItem> =
 
 type ChartProps = ComponentProps<"oj-chart">;
 
+/*
 type Activity = {
     id: number;
     name: string;
@@ -62,9 +63,10 @@ const activityDataProvider = new MutableArrayDataProvider<Activity["id"], Activi
 
 type ListViewProps = ComponentProps<"oj-list-view">;
 const gridlinesItemVisible: ListViewProps["gridlines"] = { item: "visible" };
+ */
 
-export function Content() {
-    const [val, setVal] = useState("pie" as ChartProps["type"]);
+const ItemDetailContainer = () => {
+    const [val, setVal] = useState("bar" as ChartProps["type"]);
 
     const valChangeHandler = useCallback(
         (event: ojSelectSingle.valueChanged<ChartType["value"], ChartType>) => {
@@ -74,9 +76,16 @@ export function Content() {
     );
 
     const chartItem = (item: ojChart.ItemTemplateContext<ChartItem["id"], ChartItem>) => {
-        return <oj-chart-item value={item.data.value} groupId={[item.data.group]} seriesId={item.data.series}></oj-chart-item>;
+        return (
+            <oj-chart-item
+                value={item.data.value}
+                groupId={[item.data.group]}
+                seriesId={item.data.series}
+            ></oj-chart-item>
+        );
     };
 
+    /*
     const renderListItem =
         (item: ojListView.ItemTemplateContext<Activity["id"], Activity>
         ) => {
@@ -90,8 +99,32 @@ export function Content() {
                 </li>
             );
         };
+    */
 
     return (
+        <div id="itemDetailsContainer" className="oj-bg-neutral-30">
+            <h3>Item Details</h3>
+            <oj-label for="basicSelect">Select Chart:</oj-label>
+            <oj-select-single
+                id="basicSelect"
+                class="selectSingleStyle"
+                data={chartTypesDP}
+                value={val}
+                onvalueChanged={valChangeHandler}
+            ></oj-select-single>
+            <oj-chart
+                id="barChart"
+                type={val}
+                data={chartDataProvider}
+                animationOnDisplay="auto"
+                animationOnDataChange="auto"
+                hoverBehavior="dim"
+                class="chartStyle">
+                <template slot="itemTemplate" render={chartItem}></template>
+            </oj-chart>
+        </div>
+
+        /*
         <div class="oj-web-applayout-max-width oj-web-applayout-content">
             <h1>Product Information</h1>
             <div id="activitiesContainer">
@@ -103,7 +136,7 @@ export function Content() {
                     <template slot="itemTemplate" render={renderListItem}></template>
                 </oj-list-view>
             </div>
-            <div id="itemDetailsContainer">
+            <div id="itemDetailsContainer" class="oj-bg-neutral-30">
                 <h3>Item Details</h3>
                 <oj-label for="basicSelect">Select Chart:</oj-label>
                 <oj-select-single id="basicSelect" class="selectSingleStyle" data={chartTypesDP} value={val} onvalueChanged={valChangeHandler}></oj-select-single>
@@ -113,5 +146,8 @@ export function Content() {
                 </oj-chart>
             </div>
         </div>
+        */
     );
 }
+
+export default ItemDetailContainer;
